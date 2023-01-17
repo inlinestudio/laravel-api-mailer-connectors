@@ -1,0 +1,79 @@
+{
+    "name": "inlinestudio/mailconnectors",
+    "description": "A library with connectors for api based email sending on Google and O365",
+    "keywords": [
+        "filament",
+        "laravel",
+        "ticketing",
+        "library"
+    ],
+    "homepage": "https://github.com/inlinestudio/laravel-api-mailer-connectors",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Inline Studio",
+            "email": "office@inlinestudio.hu",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "microsoft/microsoft-graph": "^1.5",
+        "spatie/laravel-package-tools": "^1.13.0",
+        "illuminate/contracts": "^9.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.28",
+        "itsgoingd/clockwork": "^5.1",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^6.0",
+        "nunomaduro/larastan": "^2.0.1",
+        "orchestra/testbench": "^7.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/phpunit": "^9.5",
+        "spatie/laravel-ray": "^1.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "InlineStudio\\MailConnectors\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InlineStudio\\MailConnectors\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true,
+            "composer/package-versions-deprecated": true,
+            "ergebnis/composer-normalize": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "InlineStudio\\MailConnectors\\MailConnectorServiceProvider"
+            ],
+            "aliases": {
+                "MailConnector": "InlineStudio\\MailConnectors\\Facades\\MailConnector"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
