@@ -75,7 +75,7 @@ class Office365Connector
         }
 
         return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/sendmail")
-            ->attachBody($this->getBody($message))
+            ->attachBody($this->getBody($message, true))
             ->setReturnType(Message::class)
             ->execute();
     }
