@@ -69,7 +69,8 @@ class Office365Connector
             $this->uploadLargeAttachments($message, $draft->getId());
 
             // Send the message
-            return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())) . "/messages/" . $draft->getId() . "/send")
+            return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draft->getId() . "/send")
+                ->setReturnType(Message::class)
                 ->execute();
         }
 
@@ -81,8 +82,8 @@ class Office365Connector
 
     protected function createDraftMessage(Email $message): Message
     {
-        return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())) . "/messages")
-            ->attachBody($this->getBody($message, true))
+        return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages")
+            ->attachBody($this->getBody($message, false, true))
             ->setReturnType(Message::class)
             ->execute();
     }
@@ -105,7 +106,7 @@ class Office365Connector
                     'contentId' => $id
                 ];
 
-                $this->client->createRequest("POST", "/users/" . (current($message->getFrom())) . "/messages/" . $draftId . "/attachments")
+                $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draftId . "/attachments")
                     ->attachBody($attachmentBody)
                     ->setReturnType(UploadSession::class)
                     ->execute();
@@ -125,7 +126,7 @@ class Office365Connector
             ]
         ];
 
-        $uploadSession = $this->client->createRequest("POST", "/users/" . (current($message->getFrom())) . "/messages/" . $draftId . "/attachments/createUploadSession")
+        $uploadSession = $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draftId . "/attachments/createUploadSession")
             ->attachBody($attachmentMessage)
             ->setReturnType(UploadSession::class)
             ->execute();
@@ -167,7 +168,7 @@ class Office365Connector
 
     protected function getBodySize(Email $message): float
     {
-        $messageBody = $this->getBody($message);
+        $messageBody = $this->getBody($message, true);
         $messageBodyLength = mb_strlen(json_encode($messageBody, JSON_NUMERIC_CHECK), '8bit');
 
         return $messageBodyLength / self::BYTE_TO_MB; //byte -> mb
@@ -176,7 +177,7 @@ class Office365Connector
     /**
      * Get body for the message.
      */
-    protected function getBody(Email $message, bool $hasHugeAttachment = false): array
+    protected function getBody(Email $message, bool $withAttachments = false, bool $isDraft = false): array
     {
         $messageData = [
             'from' => [
@@ -196,12 +197,11 @@ class Office365Connector
             ]
         ];
 
-        if (!$hasHugeAttachment) {
+        if (!$isDraft) {
             $messageData = ['message' => $messageData];
         }
 
-
-        if (count($message->getAttachments()) > 0) {
+        if (count($message->getAttachments()) > 0 && $withAttachments) {
             $attachments = [];
             foreach ($message->getAttachments() as $attachment) {
                 $attachments[] = [
