@@ -4,7 +4,7 @@
     "keywords": [
         "laravel",
         "mail",
-        "library",
+        "library"
     ],
     "homepage": "https://github.com/inlinestudio/laravel-api-mailer-connectors",
     "license": "MIT",
