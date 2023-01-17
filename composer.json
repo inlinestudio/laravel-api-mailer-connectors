@@ -2,10 +2,9 @@
     "name": "inlinestudio/mailconnectors",
     "description": "A library with connectors for api based email sending on Google and O365",
     "keywords": [
-        "filament",
         "laravel",
-        "ticketing",
-        "library"
+        "mail",
+        "library",
     ],
     "homepage": "https://github.com/inlinestudio/laravel-api-mailer-connectors",
     "license": "MIT",

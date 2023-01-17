@@ -1,6 +1,6 @@
 [![run-tests](https://github.com/inlinestudio/laravel-api-mailer-connectors/actions/workflows/run-tests.yml/badge.svg)](https://github.com/inlinestudio/laravel-api-mailer-connectors/actions/workflows/run-tests.yml)
 [![codecov](https://codecov.io/gh/inlinestudio/laravel-api-mailer-connectors/branch/main/graph/badge.svg?token=CytArLiyWH)](https://codecov.io/gh/inlinestudio/laravel-api-mailer-connectors)
-#  Laravel Microsoft Graph  Mail driver - Mail Driver for Office365 and (soon) Google
+#  Laravel API Mail driver - Mail Driver for Office365 and (soon) Google
 
 
 Mail driver for the [Laravel framework](https://laravel.com/) to send emails using Microsoft Graph without user authentication and SMTP. Only specify the E-Mail-Address in the FROM-Header of the E-Mail and this package will send the email trough the providers API and put the sent E-Mail in the sender's Mailbox sent folder.
