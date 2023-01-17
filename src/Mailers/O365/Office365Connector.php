@@ -4,6 +4,7 @@ namespace InlineStudio\MailConnectors\Mailers\O365;
 
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model\Message;
+use Microsoft\Graph\Model\UploadSession;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use Illuminate\Support\Str;
