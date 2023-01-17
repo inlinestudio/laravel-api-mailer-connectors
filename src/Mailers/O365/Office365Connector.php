@@ -75,7 +75,7 @@ class Office365Connector
 
         return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/sendmail")
             ->attachBody($this->getBody($message))
-            ->setReturnType(\Microsoft\Graph\Model\Message::class)
+            ->setReturnType(Message::class)
             ->execute();
     }
 
@@ -83,7 +83,7 @@ class Office365Connector
     {
         return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())) . "/messages")
             ->attachBody($this->getBody($message, true))
-            ->setReturnType(\Microsoft\Graph\Model\Message::class)
+            ->setReturnType(Message::class)
             ->execute();
     }
 
