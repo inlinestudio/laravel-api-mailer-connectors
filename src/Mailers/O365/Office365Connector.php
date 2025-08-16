@@ -2,13 +2,13 @@
 
 namespace InlineStudio\MailConnectors\Mailers\O365;
 
+use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Support\Str;
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model\Message;
 use Microsoft\Graph\Model\UploadSession;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
-use Illuminate\Support\Str;
-use GuzzleHttp\Client as GuzzleClient;
+use Symfony\Component\Mime\Email;
 
 class Office365Connector
 {
@@ -18,7 +18,9 @@ class Office365Connector
     protected Graph $client;
 
     protected string $clientId;
+
     protected string $clientSecret;
+
     protected string $tenant;
 
     protected const BYTE_TO_MB = 1048576;
@@ -38,8 +40,8 @@ class Office365Connector
 
     protected function getAccessToken(): string
     {
-        $guzzle = new GuzzleClient();
-        $url = 'https://login.microsoftonline.com/' . $this->tenant . '/oauth2/v2.0/token';
+        $guzzle = new GuzzleClient;
+        $url = 'https://login.microsoftonline.com/'.$this->tenant.'/oauth2/v2.0/token';
         $response = $guzzle->post(
             $url,
             [
@@ -69,12 +71,12 @@ class Office365Connector
             $this->uploadLargeAttachments($message, $draft->getId());
 
             // Send the message
-            return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draft->getId() . "/send")
+            return $this->client->createRequest('POST', '/users/'.(current($message->getFrom())->getAddress()).'/messages/'.$draft->getId().'/send')
                 ->setReturnType(Message::class)
                 ->execute();
         }
 
-        return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/sendmail")
+        return $this->client->createRequest('POST', '/users/'.(current($message->getFrom())->getAddress()).'/sendmail')
             ->attachBody($this->getBody($message, true))
             ->setReturnType(Message::class)
             ->execute();
@@ -82,7 +84,7 @@ class Office365Connector
 
     protected function createDraftMessage(Email $message): Message
     {
-        return $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages")
+        return $this->client->createRequest('POST', '/users/'.(current($message->getFrom())->getAddress()).'/messages')
             ->attachBody($this->getBody($message, false, true))
             ->setReturnType(Message::class)
             ->execute();
@@ -94,7 +96,7 @@ class Office365Connector
             $fileName = $attachment->getPreparedHeaders()->getHeaderParameter('Content-Disposition', 'filename');
             $content = $attachment->getBody();
             $fileSize = strlen($content);
-            $size = $fileSize / self::BYTE_TO_MB; //byte -> mb
+            $size = $fileSize / self::BYTE_TO_MB; // byte -> mb
             $id = Str::random(10);
 
             if ($size <= 3) {
@@ -103,10 +105,10 @@ class Office365Connector
                     'name' => $fileName,
                     'contentType' => $attachment->getPreparedHeaders()->get('Content-Type')->getBody(),
                     'contentBytes' => base64_encode($attachment->getBody()),
-                    'contentId' => $id
+                    'contentId' => $id,
                 ];
 
-                $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draftId . "/attachments")
+                $this->client->createRequest('POST', '/users/'.(current($message->getFrom())->getAddress()).'/messages/'.$draftId.'/attachments')
                     ->attachBody($attachmentBody)
                     ->setReturnType(UploadSession::class)
                     ->execute();
@@ -123,19 +125,19 @@ class Office365Connector
                 'attachmentType' => 'file',
                 'name' => $fileName,
                 'size' => $fileSize,
-            ]
+            ],
         ];
 
-        $uploadSession = $this->client->createRequest("POST", "/users/" . (current($message->getFrom())->getAddress()) . "/messages/" . $draftId . "/attachments/createUploadSession")
+        $uploadSession = $this->client->createRequest('POST', '/users/'.(current($message->getFrom())->getAddress()).'/messages/'.$draftId.'/attachments/createUploadSession')
             ->attachBody($attachmentMessage)
             ->setReturnType(UploadSession::class)
             ->execute();
 
-        $fragSize =  1024 * 1024 * 4; //4mb at once...
+        $fragSize = 1024 * 1024 * 4; // 4mb at once...
         $numFragments = ceil($fileSize / $fragSize);
         $contentChunked = str_split($content, $fragSize);
         $bytesRemaining = $fileSize;
-        $guzzle = new GuzzleClient();
+        $guzzle = new GuzzleClient;
 
         $i = 0;
         while ($i < $numFragments) {
@@ -151,14 +153,14 @@ class Office365Connector
             $contentRange = "bytes {$start}-{$end}/{$fileSize}";
             $headers = [
                 'Content-Length' => $numBytes,
-                'Content-Range' => $contentRange
+                'Content-Range' => $contentRange,
             ];
 
             $guzzle->put($uploadSession->getUploadUrl(), [
-                'headers'         => $headers,
-                'body'            => $data,
+                'headers' => $headers,
+                'body' => $data,
                 'allow_redirects' => false,
-                'timeout'         => 1000
+                'timeout' => 1000,
             ]);
 
             $bytesRemaining = $bytesRemaining - $chunkSize;
@@ -171,7 +173,7 @@ class Office365Connector
         $messageBody = $this->getBody($message, true);
         $messageBodyLength = mb_strlen(json_encode($messageBody, JSON_NUMERIC_CHECK), '8bit');
 
-        return $messageBodyLength / self::BYTE_TO_MB; //byte -> mb
+        return $messageBodyLength / self::BYTE_TO_MB; // byte -> mb
     }
 
     /**
@@ -184,7 +186,7 @@ class Office365Connector
                 'emailAddress' => [
                     'address' => current($message->getFrom())->getAddress(),
                     'name' => current($message->getFrom())->getName(),
-                ]
+                ],
             ],
             'toRecipients' => $this->getTo($message),
             'ccRecipients' => $this->getCc($message),
@@ -193,11 +195,11 @@ class Office365Connector
             'subject' => $message->getSubject(),
             'body' => [
                 'contentType' => $message->getHtmlBody() ? 'html' : 'text',
-                'content' => $message->getHtmlBody() ?: $message->getTextBody()
-            ]
+                'content' => $message->getHtmlBody() ?: $message->getTextBody(),
+            ],
         ];
 
-        if (!$isDraft) {
+        if (! $isDraft) {
             $messageData = ['message' => $messageData];
         }
 
@@ -205,11 +207,11 @@ class Office365Connector
             $attachments = [];
             foreach ($message->getAttachments() as $attachment) {
                 $attachments[] = [
-                    "@odata.type" => "#microsoft.graph.fileAttachment",
-                    "name" => $attachment->getFilename(),
-                    "contentType" => $attachment->getContentType(),
-                    "contentBytes" => base64_encode($attachment->getBody()),
-                    'contentId'    => $attachment->getContentId()
+                    '@odata.type' => '#microsoft.graph.fileAttachment',
+                    'name' => $attachment->getFilename(),
+                    'contentType' => $attachment->getContentType(),
+                    'contentBytes' => base64_encode($attachment->getBody()),
+                    'contentId' => $attachment->getContentId(),
                 ];
             }
             $messageData['message']['attachments'] = $attachments;
@@ -228,7 +230,7 @@ class Office365Connector
                 'emailAddress' => [
                     'address' => $recipient->getAddress(),
                     'name' => $recipient->getName(),
-                ]
+                ],
             ]
         )->values()->toArray();
     }
@@ -239,11 +241,11 @@ class Office365Connector
     protected function getCc(Email $message): array
     {
         return collect($message->getCc())->map(
-            fn (Address $cc)  => [
+            fn (Address $cc) => [
                 'emailAddress' => [
                     'address' => $cc->getAddress(),
                     'name' => $cc->getName(),
-                ]
+                ],
             ]
         )->values()->toArray();
     }
@@ -254,12 +256,11 @@ class Office365Connector
     protected function getReplyTo(Email $message): array
     {
         return collect($message->getReplyTo())->map(
-            fn (Address $replyTo) =>
-            [
+            fn (Address $replyTo) => [
                 'emailAddress' => [
                     'address' => $replyTo->getAddress(),
                     'name' => $replyTo->getName(),
-                ]
+                ],
             ]
         )->values()->toArray();
     }
@@ -274,7 +275,7 @@ class Office365Connector
                 'emailAddress' => [
                     'address' => $bcc->getAddress(),
                     'name' => $bcc->getName(),
-                ]
+                ],
             ]
         )->values()->toArray();
     }
