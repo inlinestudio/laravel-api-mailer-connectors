@@ -57,11 +57,17 @@ class Office365Connector
         return $token->access_token;
     }
 
+    protected function refreshClientToken(): void
+    {
+        $this->client->setAccessToken($this->getAccessToken());
+    }
+
     /**
      * Send a request to the API to send out the email.
      */
     public function sendMessageRequest(Email $message): Message
     {
+        $this->refreshClientToken();
         // If the whole message body is bigger than 4MB we'll handle it differently
         if ($this->getBodySize($message) >= 4) {
             // Create a draft message
