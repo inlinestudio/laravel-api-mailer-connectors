@@ -14,8 +14,7 @@ class MailConnectorServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('inlinestudio-mailconnectors')
-            ->hasConfigFile()
-            ->hasViews();
+            ->hasConfigFile();
     }
 
     public function packageBooted(): void
