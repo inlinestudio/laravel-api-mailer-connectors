@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/inlinestudio/laravel-api-mailer-connectors/compare/v1.0.0...v1.0.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* add laravel 13 ([ecf0c7a](https://github.com/inlinestudio/laravel-api-mailer-connectors/commit/ecf0c7a3fed9761fbb92fb67822873ad2e25e218))
+
 ## [1.0.0](https://github.com/inlinestudio/laravel-api-mailer-connectors/compare/v0.0.11...v1.0.0) (2026-02-12)
 
 
